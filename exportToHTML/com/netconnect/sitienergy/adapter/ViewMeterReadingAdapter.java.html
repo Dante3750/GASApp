@@ -1,0 +1,151 @@
+<html>
+<head>
+<title>ViewMeterReadingAdapter.java</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.s0 { color: #cc7832;}
+.s1 { color: #a9b7c6;}
+.s2 { color: #808080;}
+.s3 { color: #6a8759;}
+.s4 { color: #6897bb;}
+</style>
+</head>
+<body bgcolor="#2b2b2b">
+<table CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#606060" >
+<tr><td><center>
+<font face="Arial, Helvetica" color="#000000">
+ViewMeterReadingAdapter.java</font>
+</center></td></tr></table>
+<pre><span class="s0">package </span><span class="s1">com.netconnect.sitienergy.adapter</span><span class="s0">;</span>
+
+import <span class="s1">android.content.Context</span><span class="s0">;</span>
+import <span class="s1">android.graphics.Bitmap</span><span class="s0">;</span>
+import <span class="s1">android.graphics.BitmapFactory</span><span class="s0">;</span>
+import <span class="s1">android.graphics.Color</span><span class="s0">;</span>
+import <span class="s1">android.text.TextUtils</span><span class="s0">;</span>
+import <span class="s1">android.util.Base64</span><span class="s0">;</span>
+import <span class="s1">android.view.LayoutInflater</span><span class="s0">;</span>
+import <span class="s1">android.view.View</span><span class="s0">;</span>
+import <span class="s1">android.view.ViewGroup</span><span class="s0">;</span>
+import <span class="s1">android.widget.BaseAdapter</span><span class="s0">;</span>
+import <span class="s1">android.widget.ImageView</span><span class="s0">;</span>
+import <span class="s1">android.widget.TextView</span><span class="s0">;</span>
+
+import <span class="s1">com.netconnect.sitienergy.R</span><span class="s0">;</span>
+import <span class="s1">com.netconnect.sitienergy.utils.NCUtils</span><span class="s0">;</span>
+
+import <span class="s1">java.text.DateFormat</span><span class="s0">;</span>
+import <span class="s1">java.text.ParseException</span><span class="s0">;</span>
+import <span class="s1">java.text.SimpleDateFormat</span><span class="s0">;</span>
+import <span class="s1">java.util.ArrayList</span><span class="s0">;</span>
+import <span class="s1">java.util.Date</span><span class="s0">;</span>
+import <span class="s1">java.util.HashMap</span><span class="s0">;</span>
+
+public class <span class="s1">ViewMeterReadingAdapter </span><span class="s0">extends </span><span class="s1">BaseAdapter {</span>
+    ArrayList&lt;HashMap&lt;String<span class="s0">, </span><span class="s1">String&gt;&gt; readingList = </span><span class="s0">new </span><span class="s1">ArrayList&lt;HashMap&lt;String</span><span class="s0">, </span><span class="s1">String&gt;&gt;()</span><span class="s0">;</span>
+    <span class="s1">Context context</span><span class="s0">;</span>
+    private <span class="s1">OnImgClickListener onImgClickListener</span><span class="s0">;</span>
+    int<span class="s1">[] imageId</span><span class="s0">;</span>
+    private static <span class="s1">LayoutInflater inflater = </span><span class="s0">null;</span>
+
+    public <span class="s1">ViewMeterReadingAdapter(Context context</span><span class="s0">, </span><span class="s1">ArrayList&lt;HashMap&lt;String</span><span class="s0">, </span><span class="s1">String&gt;&gt; readingList) {</span>
+        <span class="s0">this</span><span class="s1">.context = context</span><span class="s0">;</span>
+        this<span class="s1">.readingList = readingList</span><span class="s0">;</span>
+        <span class="s1">inflater = (LayoutInflater) context.</span>
+                getSystemService(Context.LAYOUT_INFLATER_SERVICE)<span class="s0">;</span>
+    <span class="s1">}</span>
+
+    @Override
+    <span class="s0">public int </span><span class="s1">getCount() {</span>
+        <span class="s2">// TODO Auto-generated method stub</span>
+        <span class="s0">return </span><span class="s1">readingList.size()</span><span class="s0">;</span>
+    <span class="s1">}</span>
+
+    @Override
+    <span class="s0">public </span><span class="s1">Object getItem(</span><span class="s0">int </span><span class="s1">position) {</span>
+        <span class="s2">// TODO Auto-generated method stub</span>
+        <span class="s0">return </span><span class="s1">position</span><span class="s0">;</span>
+    <span class="s1">}</span>
+
+    @Override
+    <span class="s0">public long </span><span class="s1">getItemId(</span><span class="s0">int </span><span class="s1">position) {</span>
+        <span class="s2">// TODO Auto-generated method stub</span>
+        <span class="s0">return </span><span class="s1">position</span><span class="s0">;</span>
+    <span class="s1">}</span>
+
+    <span class="s0">public class </span><span class="s1">ViewHolder {</span>
+        TextView tvUploadDate<span class="s0">;</span>
+        <span class="s1">TextView tvReading</span><span class="s0">;</span>
+        <span class="s1">TextView tvStatus</span><span class="s0">;</span>
+        <span class="s1">ImageView imgMeter</span><span class="s0">;</span>
+    <span class="s1">}</span>
+
+    @Override
+    <span class="s0">public </span><span class="s1">View getView(</span><span class="s0">final int </span><span class="s1">position</span><span class="s0">, </span><span class="s1">View convertView</span><span class="s0">, </span><span class="s1">ViewGroup parent) {</span>
+        View v = convertView<span class="s0">;</span>
+        <span class="s1">ViewHolder holder = </span><span class="s0">new </span><span class="s1">ViewHolder()</span><span class="s0">;</span>
+        if <span class="s1">(v == </span><span class="s0">null</span><span class="s1">) {</span>
+            v = inflater.inflate(R.layout.row_view_meter_reading<span class="s0">, null</span><span class="s1">)</span><span class="s0">;</span>
+            <span class="s1">holder.tvUploadDate = (TextView) v.findViewById(R.id.txtUploadDate)</span><span class="s0">;</span>
+            <span class="s1">holder.tvReading = (TextView) v.findViewById(R.id.txtReading)</span><span class="s0">;</span>
+            <span class="s1">holder.tvStatus = (TextView) v.findViewById(R.id.txtStatus)</span><span class="s0">;</span>
+            <span class="s1">holder.imgMeter = (ImageView) v.findViewById(R.id.meter_image)</span><span class="s0">;</span>
+            <span class="s1">v.setTag(holder)</span><span class="s0">;</span>
+        <span class="s1">} </span><span class="s0">else </span><span class="s1">{</span>
+            holder = (ViewHolder) v.getTag()<span class="s0">;</span>
+        <span class="s1">}</span>
+
+        DateFormat inputDF = <span class="s0">new </span><span class="s1">SimpleDateFormat(</span><span class="s3">&quot;yyyy-MM-dd&quot;</span><span class="s1">)</span><span class="s0">;</span>
+        <span class="s1">Date date = </span><span class="s0">null;</span>
+        final <span class="s1">String uploadReadingDate= readingList.get(position).get(</span><span class="s3">&quot;upload_reading_date&quot;</span><span class="s1">)</span><span class="s0">;</span>
+        if<span class="s1">(!TextUtils.isEmpty(uploadReadingDate) || uploadReadingDate != </span><span class="s0">null</span><span class="s1">) {</span>
+            <span class="s0">try </span><span class="s1">{</span>
+                date = inputDF.parse(uploadReadingDate)<span class="s0">;</span>
+                <span class="s1">SimpleDateFormat format2 = </span><span class="s0">new </span><span class="s1">SimpleDateFormat(</span><span class="s3">&quot;dd MMM yyyy&quot;</span><span class="s1">)</span><span class="s0">;</span>
+                <span class="s1">holder.tvUploadDate.setText(</span><span class="s3">&quot;Uploaded on &quot;</span><span class="s1">+format2.format(date))</span><span class="s0">;</span>
+            <span class="s1">} </span><span class="s0">catch </span><span class="s1">(ParseException e) {</span>
+                e.printStackTrace()<span class="s0">;</span>
+            <span class="s1">}</span>
+        }
+
+        holder.tvReading.setText(<span class="s3">&quot;Reading: &quot; </span><span class="s1">+ readingList.get(position).get(</span><span class="s3">&quot;reading&quot;</span><span class="s1">))</span><span class="s0">;</span>
+        final <span class="s1">String id = readingList.get(position).get(</span><span class="s3">&quot;bill_id&quot;</span><span class="s1">)</span><span class="s0">;</span>
+
+        if <span class="s1">(readingList.get(position).get(</span><span class="s3">&quot;admin_approval&quot;</span><span class="s1">).equals(</span><span class="s3">&quot;0&quot;</span><span class="s1">)) {</span>
+            holder.tvStatus.setText(<span class="s3">&quot;Pending&quot;</span><span class="s1">)</span><span class="s0">;</span>
+            <span class="s1">holder.tvStatus.setBackgroundColor(Color.parseColor(</span><span class="s3">&quot;#FFF1060D&quot;</span><span class="s1">))</span><span class="s0">;</span>
+        <span class="s1">}</span><span class="s0">else</span><span class="s1">{</span>
+            holder.tvStatus.setText(<span class="s3">&quot;Approved&quot;</span><span class="s1">)</span><span class="s0">;</span>
+            <span class="s1">holder.tvStatus.setBackgroundColor(Color.parseColor(</span><span class="s3">&quot;#FF3E8622&quot;</span><span class="s1">))</span><span class="s0">;</span>
+        <span class="s1">}</span>
+        <span class="s0">final </span><span class="s1">String meterString = readingList.get(position).get(</span><span class="s3">&quot;meter_image&quot;</span><span class="s1">)</span><span class="s0">;</span>
+        <span class="s1">Bitmap bm =  NCUtils.StringToBitMap(meterString)</span><span class="s0">;</span>
+        if<span class="s1">(TextUtils.isEmpty(meterString) || meterString == </span><span class="s0">null </span><span class="s1">|| meterString.length()==</span><span class="s4">0</span><span class="s1">){</span>
+            holder.imgMeter.setBackgroundResource(R.drawable.img_not_available)<span class="s0">;</span>
+        <span class="s1">}</span><span class="s0">else</span><span class="s1">{</span>
+            holder.imgMeter.setImageBitmap(bm)<span class="s0">;</span>
+        <span class="s1">}</span>
+
+        <span class="s0">final </span><span class="s1">ImageView img = holder.imgMeter</span><span class="s0">;</span>
+        <span class="s1">holder.imgMeter.setOnClickListener(</span><span class="s0">new </span><span class="s1">View.OnClickListener() {</span>
+            @Override
+            <span class="s0">public void </span><span class="s1">onClick(View v) {</span>
+                <span class="s0">if</span><span class="s1">(!TextUtils.isEmpty(meterString)){</span>
+                    onImgClickListener.imgClicked(meterString<span class="s0">,</span><span class="s1">img)</span><span class="s0">;</span>
+                <span class="s1">}</span>
+            }
+        })<span class="s0">;</span>
+        return <span class="s1">v</span><span class="s0">;</span>
+    <span class="s1">}</span>
+
+    <span class="s0">public interface </span><span class="s1">OnImgClickListener {</span>
+        <span class="s0">public void </span><span class="s1">imgClicked(String encodedString</span><span class="s0">,</span><span class="s1">ImageView imageView)</span><span class="s0">;</span>
+    <span class="s1">}</span>
+
+    <span class="s0">public void </span><span class="s1">setOnImgClickListener(OnImgClickListener onImgClickListener) {</span>
+        <span class="s0">this</span><span class="s1">.onImgClickListener = onImgClickListener</span><span class="s0">;</span>
+    <span class="s1">}</span>
+}
+</pre>
+</body>
+</html>
